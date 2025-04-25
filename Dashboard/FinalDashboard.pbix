@@ -1,0 +1,54 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load dataset
+df = pd.read_csv("sales_data.csv")
+
+# Quick look
+print(df.head())
+print(df.info())
+print(df.describe())
+print(df.isnull().sum())
+
+# Optional: Convert 'Order Date' to datetime
+df['Order Date'] = pd.to_datetime(df['Order Date'], errors='coerce')
+
+# Add new columns
+df['Month'] = df['Order Date'].dt.month
+df['Year'] = df['Order Date'].dt.year
+
+# KPI Calculation
+total_sales = df['Sales'].sum()
+total_profit = df['Profit'].sum()
+avg_profit_margin = (df['Profit'].sum() / df['Sales'].sum()) * 100
+
+print(f"Total Sales: ₹{total_sales:,.2f}")
+print(f"Total Profit: ₹{total_profit:,.2f}")
+print(f"Profit Margin: {avg_profit_margin:.2f}%")
+
+
+# Sales Trend
+df.groupby('Order Date')['Sales'].sum().plot(figsize=(12, 6), title='Sales Over Time')
+plt.ylabel('Sales (₹)')
+plt.grid(True)
+plt.show()
+
+# Sales by Category
+plt.figure(figsize=(8,5))
+sns.barplot(data=df, x='Category', y='Sales', estimator=sum, ci=None)
+plt.title('Total Sales by Category')
+plt.xticks(rotation=45)
+plt.show()
+
+# Profit by Region
+plt.figure(figsize=(8,5))
+sns.barplot(data=df, x='Region', y='Profit', estimator=sum, ci=None)
+plt.title('Profit by Region')
+plt.xticks(rotation=45)
+plt.show()
+
+
+# Export cleaned file
+df.to_csv("cleaned_sales_data.csv", index=False)
+
